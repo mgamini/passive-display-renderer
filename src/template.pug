@@ -1,0 +1,19 @@
+doctype html 
+html 
+  head
+    title MGA Passive Display 
+    style 
+      include style.css
+  body 
+    #container 
+      #cal-widget
+        #cal-today 
+          h1 Today - #{calendar.labels.day0}
+        #cal-today-plus1
+          h2 Tomorrow - #{calendar.labels.day1}
+        #cal-today-plus2
+          h3 #{calendar.labels.day2}
+        #cal-today-plus3
+          h3 #{calendar.labels.day3}
+      #todos-widget
+      #shopping-widget
