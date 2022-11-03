@@ -1,6 +1,7 @@
 const { writeFile } = require("fs").promises;
 
 const pug = require("pug");
+require("dotenv").config();
 
 const data = require("./data");
 
