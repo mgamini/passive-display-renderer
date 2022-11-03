@@ -1,12 +1,15 @@
 const { writeFile } = require("fs").promises;
 
-const pug = require("pug");
 require("dotenv").config();
+const pug = require("pug");
 
 const data = require("./data");
 
 const print = async () => {
-  const html = pug.renderFile("./template.pug", data);
+  const fetchedData = await data.fetchAll();
+  const html = pug.renderFile("./template.pug", fetchedData);
+
+  console.log(fetchedData);
 
   await writeFile("./build-local/output.html", html);
 };
