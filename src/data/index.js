@@ -1,7 +1,11 @@
-const calendar = require("./calendar");
+const getCalendar = require("./getCalendar");
 
-const hydratedData = {
-  calendar,
+module.exports = {
+  fetchAll: async () => {
+    const hydratedData = {};
+
+    hydratedData.calendar = await getCalendar();
+
+    return hydratedData;
+  },
 };
-
-module.exports = hydratedData;
