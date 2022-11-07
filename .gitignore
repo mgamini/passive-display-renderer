@@ -143,6 +143,7 @@ dist/
 # Temporary folders
 tmp/
 temp/
+build-local/
 
 ### OSX ###
 # General
