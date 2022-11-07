@@ -31,19 +31,19 @@ body {
   grid-row-gap: 0px;
 }
 
-#cal-today {
+.cal-day-0 {
   grid-area: 1 / 1 / 4 / 3;
   border-bottom: 3px solid #666;
 }
-#cal-today-plus1 {
+.cal-day-1 {
   grid-area: 4 / 1 / 6 / 2;
   border-right: 3px solid #666;
 }
-#cal-today-plus2 {
+.cal-day-2 {
   grid-area: 4 / 2 / 5 / 3;
   border-bottom: 3px solid #666;
 }
-#cal-today-plus3 {
+.cal-day-3 {
   grid-area: 5 / 2 / 6 / 3;
 }
 
@@ -60,4 +60,4 @@ body {
   grid-area: 2 / 2 / 3 / 3;
   background-color: #666;
 }
-</style></head><body> <div id="container"> <div id="cal-widget"><div id="cal-today"> <h1>Today - Thursday, Nov 3</h1></div><div id="cal-today-plus1"><h2>Tomorrow - Fri, Nov 4</h2></div><div id="cal-today-plus2"><h3>Sat, Nov 5</h3></div><div id="cal-today-plus3"><h3>Sun, Nov 6</h3></div></div><div id="todos-widget"></div><div id="shopping-widget"></div></div></body></html>
+</style></head><body> <div id="container"> <div id="cal-widget"><div class="cal-day-0"><h1>Today - Monday, Nov 7</h1><ul class="cal-events"><li class="cal-event"><div class="cal-event-time"><p>9:00 AM - 10:00 AM</p></div><div class="cal-event-name"><p>test event - earlier</p></div><div class="cal-event-calendar"><p>Garrett Amini</p></div></li><li class="cal-event"><div class="cal-event-time"><p>10:00 AM - 11:00 AM</p></div><div class="cal-event-name"><p>test event</p></div><div class="cal-event-calendar"><p>Garrett Amini</p></div></li></ul></div><div class="cal-day-1"><h2>Tomorrow - Tue, Nov 8</h2><ul class="cal-events"><li class="cal-event"><div class="cal-event-time"><p>10:00 PM - 1:00 AM</p></div><div class="cal-event-name"><p>Kraken vs. Predators</p></div><div class="cal-event-calendar"><p>Seattle Kraken</p></div></li></ul></div><div class="cal-day-2"><h3>Wed, Nov 9</h3><ul class="cal-events"><li class="cal-event all-day-event"><div class="cal-event-time"><p>All day</p></div><div class="cal-event-name"><p>test all-day event</p></div><div class="cal-event-calendar"><p>Garrett Amini</p></div></li></ul></div><div class="cal-day-3"><h3>Thu, Nov 10</h3></div></div><div id="todos-widget"></div><div id="shopping-widget"></div></div><script>const data = { calendar: [{"label":"Monday, Nov 7","events":[{"calendarName":"Garrett Amini","eventName":"test event - earlier","allDayEvent":false,"start":"2022-11-07T14:00:00.000Z","end":"2022-11-07T15:00:00.000Z","timeLabel":"9:00 AM - 10:00 AM"},{"calendarName":"Garrett Amini","eventName":"test event","allDayEvent":false,"start":"2022-11-07T15:00:00.000Z","end":"2022-11-07T16:00:00.000Z","timeLabel":"10:00 AM - 11:00 AM"}]},{"label":"Tue, Nov 8","events":[{"calendarName":"Seattle Kraken","eventName":"Kraken vs. Predators","allDayEvent":false,"start":"2022-11-09T03:00:00.000Z","end":"2022-11-09T06:00:00.000Z","timeLabel":"10:00 PM - 1:00 AM"}]},{"label":"Wed, Nov 9","events":[{"calendarName":"Garrett Amini","eventName":"test all-day event","allDayEvent":true,"start":"2022-11-09T05:00:00.000Z","end":"2022-11-10T05:00:00.000Z","timeLabel":"All day"}]},{"label":"Thu, Nov 10","events":[]}] }</script></body></html>

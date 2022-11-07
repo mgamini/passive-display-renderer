@@ -1,4 +1,3 @@
-// require("dotenv").config();
 const { google } = require("googleapis");
 
 const { time } = require("../util");
@@ -45,7 +44,7 @@ const fetchEvents = async (calendarId, endDayIdx, maxResults) => {
     const allDayEvent = !Object.hasOwn(start, "dateTime");
 
     return {
-      calendarName: data.summary,
+      calendarName: data.summary.replaceAll("(personal)", "").trim(),
       eventName: summary,
       allDayEvent,
       start: new Date(allDayEvent ? `${start.date}T00:00` : start.dateTime),
@@ -73,42 +72,13 @@ gcalService.getEvents = async (dayCount = 1, maxResults = null) => {
     const dayEnd = time.getDayEnd(i);
 
     events.push(
-      eventList.filter(({ start }) => start >= dayStart && start < dayEnd)
+      eventList
+        .filter(({ start }) => start >= dayStart && start < dayEnd)
+        .sort((a, b) => (a.start > b.start ? 1 : -1))
     );
   }
 
   return events;
 };
 
-// const test = async () => {
-//   const res = await gcalService.getEvents(0);
-//   console.log(res);
-// };
-
-// test();
-
 module.exports = gcalService;
-
-// calendar.events
-//   .list({
-//     calendarId: GOOGLE_CALENDAR_ID,
-//     timeMin: new Date().toISOString(),
-//     maxResults: 10,
-//     singleEvents: true,
-//     orderBy: "startTime",
-//   })
-//   .then((result) => {
-//     console.log(result);
-//   });
-//   (error, result) => {
-//     if (error) {
-//       res.send(JSON.stringify({ error: error }));
-//     } else {
-//       if (result.data.items.length) {
-//         res.send(JSON.stringify({ events: result.data.items }));
-//       } else {
-//         res.send(JSON.stringify({ message: "No upcoming events found." }));
-//       }
-//     }
-//   }
-// );
