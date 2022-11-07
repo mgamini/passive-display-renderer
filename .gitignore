@@ -143,7 +143,6 @@ dist/
 # Temporary folders
 tmp/
 temp/
-build-local/
 
 ### OSX ###
 # General
@@ -208,3 +207,6 @@ $RECYCLE.BIN/
 *.lnk
 
 # End of https://www.toptal.com/developers/gitignore/api/osx,node,linux,windows,sam
+
+debug.txt
+output.html
