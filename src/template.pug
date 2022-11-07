@@ -17,6 +17,33 @@ mixin calendarEvents(events)
           li.cal-event
             +calendarEvent(event)
 
+mixin todoItem(todo)
+  li.todo 
+    .todo-title
+      p= todo.title
+    if todo.assignees.length 
+      .todo-assignees
+        ul
+          each assignee in todo.assignees
+            li.todo-assignee
+              p= assignee
+    if todo.dateLabel
+      .todo-due
+        p= todo.dateLabel
+
+mixin todosStage(todoGroup)
+  tr.todo-table-row
+    td.todo-stage
+      h2= todoGroup.stage
+    td.todo-list
+      ul
+        if todoGroup.todos.length
+          each todo in todoGroup.todos
+            +todoItem(todo)
+        else
+          li.todo-empty
+            p Nothing
+
 doctype html 
 html 
   head
@@ -36,6 +63,14 @@ html
               h3 #{calendar[index].label}
             +calendarEvents(calendar[index].events)
       #todos-widget
+        h1 Todos
+        table.todo-table
+          tbody
+            each stage in todos
+              +todosStage(stage)
       #shopping-widget
     script.
-      const data = { calendar: !{JSON.stringify(calendar)} }
+      const data = { 
+        calendar: !{JSON.stringify(calendar)},
+        todos: !{JSON.stringify(todos)}
+      }
