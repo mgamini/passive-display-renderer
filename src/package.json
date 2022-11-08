@@ -9,7 +9,6 @@
   "dependencies": {
     "@notionhq/client": "^2.2.2",
     "axios": ">=0.21.1",
-    "dotenv": "^16.0.3",
     "googleapis": "^109.0.0",
     "pug": "^3.0.2"
   },

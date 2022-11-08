@@ -1,4 +1,5 @@
-const { notionService } = require("../services");
+const { getDatabase } = require("@notionhq/client/build/src/api-endpoints");
+const { NotionService } = require("../services");
 const { time } = require("../util");
 
 class Todo {
@@ -26,8 +27,36 @@ class Todo {
   }
 }
 
-module.exports = async () => {
-  const { dbProps, todos } = await notionService.getTodos();
+const TODOS_QUERY_PARAMS = {
+  filter: {
+    and: [
+      {
+        property: "Name",
+        title: {
+          is_not_empty: true,
+        },
+      },
+      {
+        property: "Stage",
+        select: {
+          is_not_empty: true,
+        },
+      },
+    ],
+  },
+  sorts: [
+    {
+      property: "Date",
+      direction: "ascending",
+    },
+  ],
+};
+
+module.exports = async ({ NOTION }) => {
+  const notionService = new NotionService(NOTION.TOKEN, NOTION.TODOS_ID);
+
+  const dbProps = await notionService.getDatabaseProps();
+  const todos = await notionService.getDatabaseItems(TODOS_QUERY_PARAMS);
 
   const output = [];
   const stageIndex = {};

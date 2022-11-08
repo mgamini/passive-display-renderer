@@ -1,7 +1,5 @@
-const { gcalService } = require("../services");
+const { GcalService } = require("../services");
 const { time } = require("../util");
-
-const DAY_COUNT = 4;
 
 class Event {
   constructor(calendarName, { summary, start, end }) {
@@ -22,9 +20,11 @@ class Event {
   }
 }
 
-module.exports = async () => {
+module.exports = async ({ GOOGLE }) => {
   const output = [];
-  const fetchedEvents = await gcalService.getEvents(DAY_COUNT);
+  const dayCount = process.env.DAY_COUNT;
+  const gcalService = new GcalService(GOOGLE);
+  const fetchedEvents = await gcalService.getEvents(dayCount);
 
   console.log(fetchedEvents);
 
@@ -36,7 +36,7 @@ module.exports = async () => {
     return agg;
   }, []);
 
-  for (let i = 0; i < DAY_COUNT; i++) {
+  for (let i = 0; i < dayCount; i++) {
     const dayStart = time.getDayStart(i);
     const dayEnd = time.getDayEnd(i);
 

@@ -1,0 +1,9 @@
+{
+  "DISPLAY_HEIGHT": "825px",
+  "DISPLAY_WIDTH": "1200px",
+  "DAY_COUNT": 4,
+  "TIME_ZONE": "America/New_York",
+  "TIME_LOCALE": "en-US",
+  "DEBUG_FILE_PATH": "./build-local/debug.txt",
+  "LOCAL_BUILD_PATH": "./build-local/output.html"
+}

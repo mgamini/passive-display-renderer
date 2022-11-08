@@ -1,5 +1,5 @@
-const LOCALE = process.env.LOCALE;
-const timeZone = process.env.TIMEZONE;
+const LOCALE = process.env.TIME_LOCALE;
+const timeZone = process.env.TIME_ZONE;
 
 // format defaults
 const weekday = "long";

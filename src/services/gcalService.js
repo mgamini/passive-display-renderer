@@ -2,55 +2,56 @@ const { google } = require("googleapis");
 
 const { time } = require("../util");
 
-const gcalService = {};
+// const gcalService = {};
 
 const SCOPES = "https://www.googleapis.com/auth/calendar.readonly";
 
-const {
-  GOOGLE_PRIVATE_KEY,
-  GOOGLE_CLIENT_EMAIL,
-  GOOGLE_PROJECT_NUMBER,
-  GOOGLE_CALENDAR_IDS,
-} = process.env;
+class GcalService {
+  constructor({ PRIVATE_KEY, CLIENT_EMAIL, PROJECT_NUMBER, CALENDAR_IDS }) {
+    const jwtClient = new google.auth.JWT(
+      CLIENT_EMAIL,
+      null,
+      PRIVATE_KEY,
+      SCOPES
+    );
 
-const jwtClient = new google.auth.JWT(
-  GOOGLE_CLIENT_EMAIL,
-  null,
-  GOOGLE_PRIVATE_KEY,
-  SCOPES
-);
+    this.client = google.calendar({
+      version: "v3",
+      project: PROJECT_NUMBER,
+      auth: jwtClient,
+    });
 
-const calendar = google.calendar({
-  version: "v3",
-  project: GOOGLE_PROJECT_NUMBER,
-  auth: jwtClient,
-});
-
-const fetchEvents = async (calendarId, endDayIdx, maxResults) => {
-  const params = {
-    calendarId,
-    timeMin: time.today.toISOString(),
-    timeMax: time.getDayEnd(endDayIdx).toISOString(),
-    singleEvents: true,
-  };
-
-  if (maxResults) {
-    params.maxResults = maxResults;
+    this.calendarIds = CALENDAR_IDS.split(",");
   }
 
-  const { data } = await calendar.events.list(params);
+  async fetchEvents({ calendarId, endDayIdx, maxResults }) {
+    const params = {
+      calendarId,
+      timeMin: time.today.toISOString(),
+      timeMax: time.getDayEnd(endDayIdx).toISOString(),
+      singleEvents: true,
+    };
 
-  return data;
-};
+    if (maxResults) {
+      params.maxResults = maxResults;
+    }
 
-gcalService.getEvents = async (dayCount = 1, maxResults = null) => {
-  const calendarIds = GOOGLE_CALENDAR_IDS.split(",");
+    const { data } = await this.client.events.list(params);
 
-  return Promise.all(
-    calendarIds.map(async (calendarId) => {
-      return await fetchEvents(calendarId, dayCount - 1, maxResults);
-    })
-  );
-};
+    return data;
+  }
 
-module.exports = gcalService;
+  async getEvents(dayCount, maxResults = null) {
+    return Promise.all(
+      this.calendarIds.map(async (calendarId) => {
+        return await this.fetchEvents({
+          calendarId,
+          endDayIdx: dayCount - 1,
+          maxResults,
+        });
+      })
+    );
+  }
+}
+
+module.exports = GcalService;

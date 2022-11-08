@@ -1,7 +1,7 @@
-const gcalService = require("./gcalService");
-const notionService = require("./notionService");
+const GcalService = require("./gcalService");
+const NotionService = require("./notionService");
 
 module.exports = {
-  gcalService,
-  notionService,
+  GcalService,
+  NotionService,
 };

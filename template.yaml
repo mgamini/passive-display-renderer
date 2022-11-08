@@ -13,6 +13,12 @@ Description: Passive Display Renderer
 Resources:
   S3Bucket:
     Type: AWS::S3::Bucket
+  S3SecretsBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: passive-display-renderer-secrets
+      PublicAccessBlockConfiguration:
+        RestrictPublicBuckets: true
   SnapshotFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -27,6 +33,12 @@ Resources:
         Variables:
           TARGET_URL: "https://google.com"
           S3_BUCKET: !Ref S3Bucket
+          S3_SECRETS: !Ref S3SecretsBucket
+          DISPLAY_HEIGHT: "825px"
+          DISPLAY_WIDTH: "1200px"
+          DAY_COUNT: 4
+          TIME_ZONE: "America/New_York"
+          TIME_LOCALE: "en-US"
       Policies:
         - S3WritePolicy:
             BucketName: !Ref S3Bucket
