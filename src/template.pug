@@ -58,31 +58,28 @@ html
     style 
       include style.css
   body 
-    #container 
+    #container(style=`width: ${display.width || '1200px'}; height: ${display.height || '825px'}`)
       #cal-widget.overflow-hidden
-        each day, index in calendar 
+        each day, index in data.calendar 
           div(class=`cal-day-${index} overflow-hidden`)
             if index === 0
-              h1 Today - #{calendar[index].label}
+              h1 Today - #{data.calendar[index].label}
             else if index === 1
-              h2 Tomorrow - #{calendar[index].label}
+              h2 Tomorrow - #{data.calendar[index].label}
             else 
-              h3 #{calendar[index].label}
-            +calendarEvents(calendar[index].events)
+              h3 #{data.calendar[index].label}
+            +calendarEvents(data.calendar[index].events)
       #todos-widget.overflow-hidden
         h1 Todos
         table.todo-table
           tbody
-            each stage in todos
+            each stage in data.todos
               +todosStage(stage)
       #shopping-widget.overflow-hidden
         h1 Shopping List
         ul.shopping-list
-          each item in shoppingList
+          each item in data.shoppingList
             +shoppingListItem(item)
     script.
-      const data = { 
-        calendar: !{JSON.stringify(calendar)},
-        todos: !{JSON.stringify(todos)},
-        shoppingList: !{JSON.stringify(shoppingList)}
-      }
+      window.display = !{JSON.stringify(display)}
+      window.data = !{JSON.stringify(data)}
