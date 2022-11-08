@@ -46,39 +46,47 @@ const queryTodos = async (database_id) => {
   return results;
 };
 
-// class Todo {
-//   constructor({ properties }) {
-//     this.title = properties.Name.title[0].plain_text;
-//     this.stage = properties.Stage.select.name;
-//     this.assignees = properties.Assignee.people.map((person) => person.name);
+const queryShoppingList = async (database_id) => {
+  const { results } = await notion.databases.query({
+    database_id,
+    filter: {
+      property: "Bought",
+      checkbox: {
+        equals: false,
+      },
+    },
+    sorts: [
+      {
+        timestamp: "last_edited_time",
+        direction: "ascending",
+      },
+    ],
+  });
 
-//     if (properties.Date.date && properties.Date.date.start) {
-//       const { start } = properties.Date.date;
-
-//       const hasTime = start.indexOf("T") > -1;
-
-//       this.date = hasTime ? new Date(start) : new Date(`${start}T00:00`);
-
-//       this.dateLabel = hasTime
-//         ? `${time.print.date.short(this.date)} at ${time.print.time.hr12(
-//             this.date
-//           )}`
-//         : time.print.date.short(this.date);
-//     } else {
-//       this.date = null;
-//       this.dateLabel = null;
-//     }
-//   }
-// }
+  return results;
+};
 
 notionService.getTodos = async () => {
-  const dbProps = await fetchDatabaseProps(process.env.NOTION_TODOS_ID);
-  const todos = await queryTodos(process.env.NOTION_TODOS_ID);
+  const dbId = process.env.NOTION_TODOS_ID;
+  const dbProps = await fetchDatabaseProps(dbId);
+  const todos = await queryTodos(dbId);
 
   return {
     dbProps,
     todos,
   };
+};
+
+notionService.getShopping = async () => {
+  const dbId = process.env.NOTION_SHOPPING_LIST_ID;
+  // const dbProps = await fetchDatabaseProps(dbId);
+  const shoppingList = await queryShoppingList(dbId);
+
+  // return {
+  //   dbProps,
+  //   shoppingList,
+  // };
+  return shoppingList;
 };
 
 // const test = async () => {

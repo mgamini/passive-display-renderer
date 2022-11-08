@@ -20,6 +20,11 @@ body {
   border: 5px solid black;
 }
 
+/* Util */
+.overflow-hidden {
+  overflow: hidden;
+}
+
 /* Calendar */
 
 #cal-widget {
@@ -59,4 +64,8 @@ body {
 #shopping-widget {
   grid-area: 2 / 2 / 3 / 3;
   background-color: #666;
+}
+
+.shopping-list {
+  columns: 2 auto;
 }

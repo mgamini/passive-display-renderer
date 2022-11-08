@@ -44,6 +44,13 @@ mixin todosStage(todoGroup)
           li.todo-empty
             p Nothing
 
+mixin shoppingListItem(item)
+  li.shopping-list-item
+    if item.quantity
+      p #{item.name} - #{item.quantity}
+    else
+      p= item.name
+
 doctype html 
 html 
   head
@@ -52,9 +59,9 @@ html
       include style.css
   body 
     #container 
-      #cal-widget
+      #cal-widget.overflow-hidden
         each day, index in calendar 
-          div(class=`cal-day-${index}`)
+          div(class=`cal-day-${index} overflow-hidden`)
             if index === 0
               h1 Today - #{calendar[index].label}
             else if index === 1
@@ -62,15 +69,20 @@ html
             else 
               h3 #{calendar[index].label}
             +calendarEvents(calendar[index].events)
-      #todos-widget
+      #todos-widget.overflow-hidden
         h1 Todos
         table.todo-table
           tbody
             each stage in todos
               +todosStage(stage)
-      #shopping-widget
+      #shopping-widget.overflow-hidden
+        h1 Shopping List
+        ul.shopping-list
+          each item in shoppingList
+            +shoppingListItem(item)
     script.
       const data = { 
         calendar: !{JSON.stringify(calendar)},
-        todos: !{JSON.stringify(todos)}
+        todos: !{JSON.stringify(todos)},
+        shoppingList: !{JSON.stringify(shoppingList)}
       }
