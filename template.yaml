@@ -16,8 +16,11 @@ Resources:
   S3SecretsBucket:
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: passive-display-renderer-secrets
+      AccessControl: Private
       PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
         RestrictPublicBuckets: true
   SnapshotFunction:
     Type: AWS::Serverless::Function
@@ -33,7 +36,8 @@ Resources:
         Variables:
           TARGET_URL: "https://google.com"
           S3_BUCKET: !Ref S3Bucket
-          S3_SECRETS: !Ref S3SecretsBucket
+          S3_SECRETS_BUCKET: !Ref S3SecretsBucket
+          S3_SECRETS_KEY: "secrets.json"
           DISPLAY_HEIGHT: "825px"
           DISPLAY_WIDTH: "1200px"
           DAY_COUNT: 4

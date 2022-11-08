@@ -2,8 +2,6 @@ const { google } = require("googleapis");
 
 const { time } = require("../util");
 
-// const gcalService = {};
-
 const SCOPES = "https://www.googleapis.com/auth/calendar.readonly";
 
 class GcalService {

@@ -8,14 +8,10 @@
   "license": "MIT",
   "dependencies": {
     "@notionhq/client": "^2.2.2",
-    "axios": ">=0.21.1",
     "googleapis": "^109.0.0",
     "pug": "^3.0.2"
   },
   "scripts": {
     "generate": "node build-local.js"
-  },
-  "devDependencies": {
-    "@google-cloud/local-auth": "^2.1.1"
   }
 }

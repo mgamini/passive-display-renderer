@@ -4,56 +4,67 @@ const AWS = require("aws-sdk");
 const chromium = require("@sparticuz/chrome-aws-lambda");
 const s3 = new AWS.S3();
 
+const render = require("./render");
+
 const pageURL = process.env.TARGET_URL;
 const agent =
   "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36";
 
 exports.handler = async (event, context) => {
-  let result = null;
-  let browser = null;
+  // let result = null;
+  // let browser = null;
+  console.log("RUNNING LAMBDA");
 
   try {
-    browser = await chromium.puppeteer.launch({
-      args: chromium.args,
-      defaultViewport: chromium.defaultViewport,
-      executablePath: await chromium.executablePath,
-      headless: chromium.headless,
-      ignoreHTTPSErrors: true,
+    const secretString = await s3.getObject({
+      Bucket: process.env.S3_SECRETS_BUCKET,
+      Key: process.env.S3_SECRETS_KEY,
+      "response-content-type": "application/json",
     });
 
-    let page = await browser.newPage();
-    await page.setUserAgent(agent);
+    console.log("secrets length:", secretString.length);
 
-    console.log("Navigating to page: ", pageURL);
+    // browser = await chromium.puppeteer.launch({
+    //   args: chromium.args,
+    //   defaultViewport: chromium.defaultViewport,
+    //   executablePath: await chromium.executablePath,
+    //   headless: chromium.headless,
+    //   ignoreHTTPSErrors: true,
+    // });
 
-    await page.goto(pageURL);
-    const buffer = await page.screenshot();
-    result = await page.title();
+    // let page = await browser.newPage();
+    // await page.setUserAgent(agent);
 
-    // upload the image using the current timestamp as filename
-    const s3result = await s3
-      .upload({
-        Bucket: process.env.S3_BUCKET,
-        Key: `${Date.now()}.png`,
-        Body: buffer,
-        ContentType: "image/png",
-        ACL: "public-read",
-      })
-      .promise();
+    // console.log("Navigating to page: ", pageURL);
 
-    console.log("S3 image URL:", s3result.Location);
+    // await page.goto(pageURL);
+    // const buffer = await page.screenshot();
+    // result = await page.title();
 
-    await page.close();
-    await browser.close();
+    // // upload the image using the current timestamp as filename
+    // const s3result = await s3
+    //   .upload({
+    //     Bucket: process.env.S3_BUCKET,
+    //     Key: `${Date.now()}.png`,
+    //     Body: buffer,
+    //     ContentType: "image/png",
+    //     ACL: "public-read",
+    //   })
+    //   .promise();
+
+    // console.log("S3 image URL:", s3result.Location);
+
+    // await page.close();
+    // await browser.close();
   } catch (error) {
     console.log(error);
   } finally {
-    if (browser !== null) {
-      await browser.close();
-    }
+    // if (browser !== null) {
+    //   await browser.close();
+    // }
   }
 
-  return result;
+  return;
 };
 
 // let response;

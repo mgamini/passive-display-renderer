@@ -26,8 +26,6 @@ module.exports = async ({ GOOGLE }) => {
   const gcalService = new GcalService(GOOGLE);
   const fetchedEvents = await gcalService.getEvents(dayCount);
 
-  console.log(fetchedEvents);
-
   const eventList = fetchedEvents.reduce((agg, { summary, items }) => {
     items.forEach((item) => {
       agg.push(new Event(summary, item));
