@@ -3,6 +3,7 @@ const { readFile, writeFile } = require("fs").promises;
 const render = require("./render");
 
 const print = async () => {
+  // in the lambda env, these are set in template.yaml
   const envString = await readFile("./env-local.json", "utf8");
   const secretsString = await readFile("./secrets.json", "utf8");
 
