@@ -32,10 +32,11 @@ Resources:
       MemorySize: 4096
       Layers:
         - !Sub "arn:aws:lambda:${AWS::Region}:764866452798:layer:chrome-aws-lambda:31"
+        # I will not be maintaining support for the following layer,
+        # and recommend you upload your own.
         - !Sub "arn:aws:lambda:us-east-1:433779689425:layer:pdr-node-modules:1"
       Environment:
         Variables:
-          TARGET_URL: "https://google.com"
           S3_BUCKET: !Ref S3Bucket
           S3_SECRETS_BUCKET: !Ref S3SecretsBucket
           S3_SECRETS_KEY: "secrets.json"
