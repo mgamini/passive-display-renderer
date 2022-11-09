@@ -5,5 +5,13 @@
   "main": "app.js",
   "repository": "https://github.com/awslabs/aws-sam-cli/tree/develop/samcli/local/init/templates/cookiecutter-aws-sam-hello-nodejs",
   "author": "garrett.amini@gmail.com",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "@notionhq/client": "^2.2.2",
+    "googleapis": "^109.0.0",
+    "pug": "^3.0.2"
+  },
+  "scripts": {
+    "local": "node build-local.js"
+  }
 }

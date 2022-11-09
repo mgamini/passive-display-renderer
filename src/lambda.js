@@ -1,109 +1,155 @@
-// const axios = require('axios')
-// const url = 'http://checkip.amazonaws.com/';
 const AWS = require("aws-sdk");
 const chromium = require("@sparticuz/chrome-aws-lambda");
 const s3 = new AWS.S3();
 
 const render = require("./render");
 
-const pageURL = process.env.TARGET_URL;
 const agent =
   "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36";
 
-exports.handler = async (event, context) => {
-  // let result = null;
-  // let browser = null;
-  console.log("RUNNING LAMBDA");
+class Snapshot {
+  constructor({ secrets, viewport }) {
+    this.secrets = secrets;
+    this.viewport = viewport;
 
-  try {
-    const secretString = await s3.getObject({
-      Bucket: process.env.S3_SECRETS_BUCKET,
-      Key: process.env.S3_SECRETS_KEY,
-      "response-content-type": "application/json",
+    this.browser;
+    this.logStep = 0;
+  }
+
+  log(message) {
+    console.log(`${this.logStep}: ${message}`);
+  }
+
+  async run() {
+    this.browser = await this.launchBrowser();
+
+    const imageUrl = await this.getSecrets(this.secrets)
+      .then(this.uploadHtml.bind(this))
+      .then(this.screenshotHtml.bind(this))
+      .then(this.uploadImage.bind(this));
+
+    await this.closeBrowser();
+
+    return imageUrl;
+  }
+
+  async launchBrowser() {
+    this.logStep++;
+    this.log("launching headless browser...");
+
+    const browser = await chromium.puppeteer.launch({
+      args: chromium.args,
+      defaultViewport: this.viewport,
+      executablePath: await chromium.executablePath,
+      headless: chromium.headless,
+      ignoreHTTPSErrors: true,
     });
 
-    console.log("secrets length:", secretString.length);
+    this.log("browser launched");
+    return browser;
+  }
 
-    // browser = await chromium.puppeteer.launch({
-    //   args: chromium.args,
-    //   defaultViewport: chromium.defaultViewport,
-    //   executablePath: await chromium.executablePath,
-    //   headless: chromium.headless,
-    //   ignoreHTTPSErrors: true,
-    // });
+  async closeBrowser() {
+    if (this.browser !== null) {
+      await this.browser.close();
+      this.browser = null;
 
-    // let page = await browser.newPage();
-    // await page.setUserAgent(agent);
+      this.logStep++;
+      this.log("browser closed");
+    }
+  }
 
-    // console.log("Navigating to page: ", pageURL);
+  async getSecrets(params) {
+    this.logStep++;
+    this.log("getting secrets...");
 
-    // await page.goto(pageURL);
-    // const buffer = await page.screenshot();
-    // result = await page.title();
+    const secretsFile = await s3.getObject(params).promise();
 
-    // // upload the image using the current timestamp as filename
-    // const s3result = await s3
-    //   .upload({
-    //     Bucket: process.env.S3_BUCKET,
-    //     Key: `${Date.now()}.png`,
-    //     Body: buffer,
-    //     ContentType: "image/png",
-    //     ACL: "public-read",
-    //   })
-    //   .promise();
+    const secrets = JSON.parse(secretsFile.Body.toString("utf-8"));
+    this.log("secrets loaded");
 
-    // console.log("S3 image URL:", s3result.Location);
+    return secrets;
+  }
 
-    // await page.close();
-    // await browser.close();
+  async uploadHtml(secrets) {
+    this.logStep++;
+    this.log("uploading html...");
+
+    const Body = await render(secrets);
+    const { Location } = await s3
+      .upload({
+        Bucket: process.env.S3_BUCKET,
+        Key: "render.html",
+        Body,
+        ContentType: "text/html",
+        ACL: "public-read",
+      })
+      .promise();
+
+    this.log("html uploaded. Location:");
+    this.log(Location);
+
+    return Location;
+  }
+
+  async screenshotHtml(targetUrl) {
+    this.logStep++;
+    this.log("taking screenshot...");
+
+    const page = await this.browser.newPage();
+    await page.setUserAgent(agent);
+
+    await page.goto(targetUrl);
+    const buffer = await page.screenshot();
+
+    this.log("screenshot taken. Closing page...");
+    await page.close();
+
+    return buffer;
+  }
+
+  async uploadImage(Body) {
+    this.logStep++;
+    this.log("uploading image...");
+
+    const { Location } = await s3
+      .upload({
+        Bucket: process.env.S3_BUCKET,
+        Key: `render.png`,
+        Body,
+        ContentType: "image/png",
+        ACL: "public-read",
+      })
+      .promise();
+
+    this.log("image uploaded");
+
+    return Location;
+  }
+}
+
+exports.handler = async () => {
+  console.log("Running snapshot function");
+
+  const snapshot = new Snapshot({
+    secrets: {
+      Bucket: process.env.S3_SECRETS_BUCKET,
+      Key: process.env.S3_SECRETS_KEY,
+    },
+    viewport: {
+      height: parseInt(process.env.DISPLAY_HEIGHT),
+      width: parseInt(process.env.DISPLAY_WIDTH),
+    },
+  });
+
+  try {
+    const imageUrl = await snapshot.run();
+    console.log("Success! Image location: ", imageUrl);
   } catch (error) {
     console.log(error);
   } finally {
-    // if (browser !== null) {
-    //   await browser.close();
-    // }
+    await snapshot.closeBrowser();
   }
 
   return;
 };
-
-// let response;
-
-// /**
-//  *
-//  * Event doc: https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-lambda-proxy-integrations.html#api-gateway-simple-proxy-for-lambda-input-format
-//  * @param {Object} event - API Gateway Lambda Proxy Input Format
-//  *
-//  * Context doc: https://docs.aws.amazon.com/lambda/latest/dg/nodejs-prog-model-context.html
-//  * @param {Object} context
-//  *
-//  * Return doc: https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-lambda-proxy-integrations.html
-//  * @returns {Object} object - API Gateway Lambda Proxy Output Format
-//  *
-//  */
-// exports.lambdaHandler = async (event, context) => {
-//   try {
-//     // const ret = await axios(url);
-//     response = {
-//       statusCode: 200,
-//       body: JSON.stringify({
-//         message: "hello world",
-//         // location: ret.data.trim()
-//       }),
-//     };
-//   } catch (err) {
-//     console.log(err);
-//     return err;
-//   }
-
-//   return response;
-// };
-
-// exports.handler = async (event, context) => {
-//   console.log("=== automated run");
-//   console.log(event);
-//   console.log("===");
-//   console.log(context);
-//   console.log("===");
-//   console.log(arguments);
-// };

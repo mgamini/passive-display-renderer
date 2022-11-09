@@ -208,6 +208,6 @@ $RECYCLE.BIN/
 
 # End of https://www.toptal.com/developers/gitignore/api/osx,node,linux,windows,sam
 
-debug.txt
-output.html
+local/build/*
 secrets.json
+samconfig.toml

@@ -1,6 +1,6 @@
 const { readFile, writeFile } = require("fs").promises;
 
-const render = require("./render");
+const render = require("../src/render");
 
 const print = async () => {
   // in the lambda env, these are set in template.yaml
@@ -10,6 +10,7 @@ const print = async () => {
   process.env = {
     ...process.env,
     ...JSON.parse(envString),
+    TEMPLATE: "../src/template.pug",
   };
 
   const html = await render(JSON.parse(secretsString));

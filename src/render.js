@@ -1,3 +1,4 @@
+const path = require("node:path");
 const pug = require("pug");
 
 const fetchData = require("./data");
@@ -9,7 +10,10 @@ module.exports = async (secrets) => {
     width: process.env.DISPLAY_WIDTH,
   };
 
-  console.log("rendering", display, data);
+  // console.log("rendering", display, data);
 
-  return pug.renderFile("./template.pug", { display, data });
+  return pug.renderFile(path.join("./", process.env.TEMPLATE), {
+    display,
+    data,
+  });
 };
