@@ -7,6 +7,8 @@ const render = require("./render");
 const agent =
   "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36";
 
+let snapshots = [];
+
 class Snapshot {
   constructor({ secrets, viewport }) {
     this.secrets = secrets;
@@ -145,6 +147,7 @@ exports.handler = async () => {
   try {
     const imageUrl = await snapshot.run();
     console.log("Success! Image location: ", imageUrl);
+    snapshots = [imageUrl];
   } catch (error) {
     console.log(error);
   } finally {

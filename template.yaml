@@ -10,6 +10,13 @@ Description: Passive Display Renderer
 #   Api:
 #     TracingEnabled: True
 
+Globals:
+  Api:
+    BinaryMediaTypes:
+      - image~1png
+      - text~1html
+      - text~1json
+
 Resources:
   S3Bucket:
     Type: AWS::S3::Bucket
@@ -25,8 +32,8 @@ Resources:
   SnapshotFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: src/
-      Handler: lambda.handler
+      CodeUri: src/snapshot/
+      Handler: snapshot.handler
       Runtime: nodejs16.x
       Timeout: 15
       MemorySize: 4096
@@ -62,10 +69,56 @@ Resources:
         #   Properties:
         #     Path: /generate
         #     Method: get
+  SnapshotAPIGateway:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      BinaryMediaTypes:
+        - image~1png
+  SnapshotAPI:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/api/
+      Handler: api.handler
+      Runtime: nodejs16.x
+      MemorySize: 128
+      Timeout: 100
+      Environment:
+        Variables:
+          SNAPSHOT_FUNCTION: !Ref SnapshotFunction
+          S3_BUCKET: !Ref S3Bucket
+      Policies:
+        - LambdaInvokePolicy:
+            FunctionName: !Ref SnapshotFunction
+        - S3ReadPolicy:
+            BucketName: !Ref S3Bucket
+      Events:
+        Generate:
+          Type: Api
+          Properties:
+            Path: /generate
+            Method: POST
+            RestApiId: !Ref SnapshotAPIGateway
+        GetRender:
+          Type: Api
+          Properties:
+            Path: /get/{id}
+            Method: GET
+            RestApiId: !Ref SnapshotAPIGateway
+        GetRenderList:
+          Type: Api
+          Properties:
+            Path: /get
+            Method: GET
+            RestApiId: !Ref SnapshotAPIGateway
+
 Outputs:
   ConsumerFunction:
     Description: SnapshotFunction function name
     Value: !Ref SnapshotFunction
+  GenerateImageApi:
+    Description: "API Gateway endpoint URL for Prod stage for Generate Image function"
+    Value: !Sub "https://${SnapshotAPIGateway}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
 # Outputs:
 #   # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
 #   # Find out more about other implicit resources you can reference within SAM
