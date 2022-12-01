@@ -4,6 +4,6 @@
   "DAY_COUNT": 4,
   "TIME_ZONE": "America/New_York",
   "TIME_LOCALE": "en-US",
-  "DEBUG_FILE_PATH": "./build/debug.txt",
-  "LOCAL_BUILD_PATH": "./build/output.html"
+  "DEBUG_FILE_PATH": "./local/build/debug.txt",
+  "LOCAL_BUILD_PATH": "./local/build/output.html"
 }

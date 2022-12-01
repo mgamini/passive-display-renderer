@@ -29,6 +29,7 @@ Resources:
         BlockPublicPolicy: true
         IgnorePublicAcls: true
         RestrictPublicBuckets: true
+
   SnapshotFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -64,61 +65,114 @@ Resources:
           Type: Schedule
           Properties:
             Schedule: rate(6 hours)
-        # GenerateImageRequest:
-        #   Type: Api
-        #   Properties:
-        #     Path: /generate
-        #     Method: get
+
   SnapshotAPIGateway:
-    Type: AWS::Serverless::Api
+    Type: AWS::Serverless::HttpApi
     Properties:
-      StageName: Prod
-      BinaryMediaTypes:
-        - image~1png
-  SnapshotAPI:
+      StageName: prod
+      CorsConfiguration:
+        AllowOrigins:
+          - "*"
+        AllowHeaders:
+          - "Access-Control-Allow-Origin"
+          - "Content-Type"
+          - "X-Requested-With"
+        AllowMethods:
+          - GET
+          - POST
+          - OPTIONS
+
+  # SnapshotAPIGateway:
+  #   Type: AWS::Serverless::Api
+  #   Properties:
+  #     StageName: Prod
+  #     BinaryMediaTypes:
+  #       - image~1png
+  #     DefinitionBody:
+  #       swagger: "2.0"
+  #       basePath: "/Prod"
+  #       schemes:
+  #         - "https"
+  #       paths:
+  #         /get/{id}:
+  #           get:
+  #             produces:
+  #               - "image/png"
+  #             responses: {}
+  #             x-amazon-apigateway-integration:
+  #               uri: !Ref SnapshotAPI # api-gateway-arn using Fn::Join
+  #               # responses: {}
+  #               # passthroughBehavior: "when_no_match"
+  #               httpMethod: "GET"
+  #               contentHandling: "CONVERT_TO_BINARY"
+  #               type: "aws_proxy"
+  SnapshotAPIGenerate:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: src/api/
-      Handler: api.handler
+      Handler: generate.handler
       Runtime: nodejs16.x
-      MemorySize: 128
-      Timeout: 100
       Environment:
         Variables:
           SNAPSHOT_FUNCTION: !Ref SnapshotFunction
-          S3_BUCKET: !Ref S3Bucket
       Policies:
         - LambdaInvokePolicy:
             FunctionName: !Ref SnapshotFunction
-        - S3ReadPolicy:
-            BucketName: !Ref S3Bucket
       Events:
-        Generate:
-          Type: Api
+        EchoJsonHttp:
+          Type: HttpApi
           Properties:
             Path: /generate
             Method: POST
-            RestApiId: !Ref SnapshotAPIGateway
-        GetRender:
-          Type: Api
+            ApiId: !Ref SnapshotAPIGateway
+
+  SnapshotAPIRenders:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/api/
+      Handler: renders.handler
+      Runtime: nodejs16.x
+      Environment:
+        Variables:
+          S3_BUCKET: !Ref S3Bucket
+      Policies:
+        - S3ReadPolicy:
+            BucketName: !Ref S3Bucket
+      Events:
+        EchoJsonHttp:
+          Type: HttpApi
+          Properties:
+            Path: /renders
+            Method: GET
+            ApiId: !Ref SnapshotAPIGateway
+
+  SnapshotAPIGet:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/api/
+      Handler: get.handler
+      Runtime: nodejs16.x
+      Environment:
+        Variables:
+          S3_BUCKET: !Ref S3Bucket
+      Policies:
+        - S3ReadPolicy:
+            BucketName: !Ref S3Bucket
+      Events:
+        EchoJsonHttp:
+          Type: HttpApi
           Properties:
             Path: /get/{id}
             Method: GET
-            RestApiId: !Ref SnapshotAPIGateway
-        GetRenderList:
-          Type: Api
-          Properties:
-            Path: /get
-            Method: GET
-            RestApiId: !Ref SnapshotAPIGateway
+            ApiId: !Ref SnapshotAPIGateway
 
 Outputs:
   ConsumerFunction:
     Description: SnapshotFunction function name
     Value: !Ref SnapshotFunction
   GenerateImageApi:
-    Description: "API Gateway endpoint URL for Prod stage for Generate Image function"
-    Value: !Sub "https://${SnapshotAPIGateway}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
+    Description: "API Gateway endpoint URL"
+    Value: !Sub "https://${SnapshotAPIGateway}.execute-api.${AWS::Region}.amazonaws.com/prod/"
 # Outputs:
 #   # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
 #   # Find out more about other implicit resources you can reference within SAM

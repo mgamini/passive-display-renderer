@@ -1,0 +1,16 @@
+{
+  "name": "Passive Display Renderer",
+  "version": "1.0.0",
+  "description": "Garrett's passive display renderer",
+  "main": "app.js",
+  "repository": "https://github.com/awslabs/aws-sam-cli/tree/develop/samcli/local/init/templates/cookiecutter-aws-sam-hello-nodejs",
+  "author": "garrett.amini@gmail.com",
+  "license": "MIT",
+  "config": {
+    "local_path": "./local",
+    "snapshot_path": "./src/snapshot"
+  },
+  "scripts": {
+    "build": "NODE_PATH=$npm_package_config_local_path/node_modules node $npm_package_config_local_path/build-local.js"
+  }
+}
