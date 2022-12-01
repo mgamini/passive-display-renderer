@@ -33,7 +33,7 @@ Resources:
   SnapshotFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: src/snapshot/
+      CodeUri: ../src/snapshot/
       Handler: snapshot.handler
       Runtime: nodejs16.x
       Timeout: 15
@@ -109,7 +109,7 @@ Resources:
   SnapshotAPIGenerate:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: src/api/
+      CodeUri: ../src/api/
       Handler: generate.handler
       Runtime: nodejs16.x
       Environment:
@@ -129,7 +129,7 @@ Resources:
   SnapshotAPIRenders:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: src/api/
+      CodeUri: ../src/api/
       Handler: renders.handler
       Runtime: nodejs16.x
       Environment:
@@ -149,7 +149,7 @@ Resources:
   SnapshotAPIGet:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: src/api/
+      CodeUri: ../src/api/
       Handler: get.handler
       Runtime: nodejs16.x
       Environment:
