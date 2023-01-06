@@ -1,0 +1,33 @@
+{
+  "name": "Passive Display Renderer",
+  "version": "1.0.0",
+  "description": "Garrett's passive display renderer",
+  "main": "app.js",
+  "repository": "https://github.com/awslabs/aws-sam-cli/tree/develop/samcli/local/init/templates/cookiecutter-aws-sam-hello-nodejs",
+  "author": "garrett.amini@gmail.com",
+  "license": "MIT",
+  "config": {
+    "region": "us-east1",
+    "credentials": "./google-creds.json",
+    "secrets_path": "./secrets.json",
+    "env_path": "./env.json",
+    "snapshot_path": "./src",
+    "local_path": "./local"
+  },
+  "dependencies": {
+    "@google-cloud/functions-framework": "^3.1.2",
+    "@google-cloud/storage": "^6.7.0",
+    "@notionhq/client": "^2.2.2",
+    "google-auth-library": "^8.7.0",
+    "googleapis": "^109.0.1",
+    "jsonwebtoken": "^8.5.1",
+    "pug": "^3.0.2",
+    "puppeteer": "^19.4.0"
+  },
+  "scripts": {
+    "keep": "GOOGLE_APPLICATION_CREDENTIALS=$npm_package_config_credentials node ./src/services/gkeepService.js",
+    "local": "GOOGLE_APPLICATION_CREDENTIALS=$npm_package_config_credentials node ./local/build-local.js",
+    "start": "GOOGLE_APPLICATION_CREDENTIALS=$npm_package_config_credentials functions-framework --target=generate",
+    "deploy": "gcloud functions deploy nodejs-http-function --gen2 --runtime=nodejs12 --region=$npm_package_config_region --source=. --entry-point=generate --trigger-http --allow-unauthenticated"
+  }
+}

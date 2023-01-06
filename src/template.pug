@@ -1,0 +1,85 @@
+mixin calendarEvent(event)
+  .cal-event-time
+    p= event.timeLabel 
+  .cal-event-name
+    p= event.eventName 
+  .cal-event-calendar
+    p= event.calendarName
+
+mixin calendarEvents(events)
+  if events.length
+    ul.cal-events
+      each event in events 
+        if event.allDayEvent
+          li.cal-event.all-day-event
+            +calendarEvent(event)
+        else 
+          li.cal-event
+            +calendarEvent(event)
+
+mixin todoItem(todo)
+  li.todo 
+    .todo-title
+      p= todo.title
+    if todo.assignees.length 
+      .todo-assignees
+        ul
+          each assignee in todo.assignees
+            li.todo-assignee
+              p= assignee
+    if todo.dateLabel
+      .todo-due
+        p= todo.dateLabel
+
+mixin todosStage(todoGroup)
+  tr.todo-table-row
+    td.todo-stage
+      h2= todoGroup.stage
+    td.todo-list
+      ul
+        if todoGroup.todos.length
+          each todo in todoGroup.todos
+            +todoItem(todo)
+        else
+          li.todo-empty
+            p Nothing
+
+mixin shoppingListItem(item)
+  li.shopping-list-item
+    if item.quantity
+      p #{item.name} - #{item.quantity}
+    else
+      p= item.name
+
+doctype html 
+html 
+  head
+    title MGA Passive Display 
+    style 
+      include style.css
+  body 
+    #container(style=`width: ${display.width || '1200px'}; height: ${display.height || '825px'}`)
+      #cal-widget.overflow-hidden
+        each day, index in data.calendar 
+          div(class=`cal-day-${index} overflow-hidden`)
+            if index === 0
+              h1 Today - #{data.calendar[index].label}
+            else if index === 1
+              h2 Tomorrow - #{data.calendar[index].label}
+            else 
+              h3 #{data.calendar[index].label}
+            +calendarEvents(data.calendar[index].events)
+      #todos-widget.overflow-hidden
+        h1 Todos
+        table.todo-table
+          tbody
+            each stage in data.todos
+              +todosStage(stage)
+      #shopping-widget.overflow-hidden
+        h1 Shopping List
+        ul.shopping-list
+          each item in data.shoppingList
+            +shoppingListItem(item)
+    script.
+      window.display = !{JSON.stringify(display)}
+      window.data = !{JSON.stringify(data)}
